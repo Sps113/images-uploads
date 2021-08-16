@@ -1,0 +1,41 @@
+version: '2'
+services:
+  web:
+    container_name: upload_image_fpm
+    build: .
+    volumes:
+      - ./:/var/www/vhosts/site/
+    links:
+      - mysql:mysql
+    command: "/usr/sbin/php-fpm7.4 -F -O"
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.31.0.1 remote_enable=1"
+      PHP_IDE_CONFIG: "serverName=Docker"
+
+  nginx:
+    container_name: upload_image_nginx
+    restart: always
+    image: nginx
+    expose:
+      - "80"
+    ports:
+      - "80:80"
+    volumes:
+      - /var/www/vhosts/site
+      - ./etc/nginx:/etc/nginx
+    volumes_from:
+      - web
+    links:
+      - web:web
+
+  mysql:
+    container_name: upload_image_mysql
+    restart: always
+    image: mysql:5.7
+    volumes:
+      - ./etc/mysql:/etc/mysql/conf.d
+      - ./storage/mysql:/var/lib/mysql
+    ports:
+      - "3306"
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
