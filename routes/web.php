@@ -16,6 +16,3 @@ use App\Http\Controllers\ImageController;
 Route::get('upload-images', [ ImageController::class, 'index' ]);
 Route::post('upload-images', [ ImageController::class, 'storeImage' ])->name('images.store');
 
-Route::get('/', function () {
-    return view('welcome');
-});

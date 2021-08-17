@@ -27,4 +27,18 @@ class ImageRequest extends FormRequest
             'file' => 'required|image|mimes:jpeg|max:20480',
         ];
     }
+
+    public function attributes()
+    {
+        return [
+            'file' => 'Image file'
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'file.required' => 'Request does not contain file',
+        ];
+    }
 }

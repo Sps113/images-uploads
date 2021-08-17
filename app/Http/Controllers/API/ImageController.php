@@ -28,7 +28,9 @@ class ImageController extends Controller
     {
         if ($imageFile = $request->file('file')) {
             $rating = $this->service->predict($imageFile);
+        } else {
+            throw new FileException('File not uploaded.');
         }
-        return response()->json(['Rating' => $rating]);
+        return response()->json(['rating' => $rating]);
     }
 }

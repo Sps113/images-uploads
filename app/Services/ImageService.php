@@ -5,6 +5,7 @@ namespace App\Services;
 
 use App\Models\Image;
 use Illuminate\Support\Str;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 class ImageService
@@ -30,11 +31,20 @@ class ImageService
         $image = Image::where('id', $id)->firstOrFail();
         $process = new Process(
             [
-                '/home/ubuntu/predict_rest/image_quality_assessment/predict  --docker-image nima-cpu --base-model-nam>',
-                $image->path
+                '/home/ubuntu/predict_rest/image_quality_assessment/predict',
+                '--docker-image',
+                'nima-cpu',
+                '--base-model-name',
+                'MobileNet',
+                '--weights-file',
+                base_path() . $image->path
             ]
         );
         $process->run();
-        return 9.9;
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+        return $process->getOutput();
     }
 }
