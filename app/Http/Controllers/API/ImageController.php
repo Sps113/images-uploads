@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use App\Http\Requests\ImageRequest;
 use App\Services\ImageService;
+use App\Http\Controllers\Controller;
 
 class ImageController extends Controller
 {
@@ -14,16 +15,20 @@ class ImageController extends Controller
         $this->service = $service;
     }
 
-    public function index()
-    {
-        return view('multiple-image');
-    }
 
-    public function storeImage(ImageRequest $request)
+    public function store(ImageRequest $request)
     {
         if ($imageFile = $request->file('file')) {
             $this->service->save($imageFile);
         }
         return response()->json('Image uploaded successfully');
+    }
+
+    public function prediction(ImageRequest $request)
+    {
+        if ($imageFile = $request->file('file')) {
+            $rating = $this->service->predict($imageFile);
+        }
+        return response()->json(['Rating' => $rating]);
     }
 }

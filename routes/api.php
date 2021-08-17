@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\API\ImageController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::group(
+    ['middleware' => 'cors',],
+    function ($router) {
+        Route::post('/v1/image', [ImageController::class, 'store']);
+        Route::post('/v1/prediction', [ImageController::class, 'prediction']);
+    }
+);
