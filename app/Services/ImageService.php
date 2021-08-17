@@ -9,12 +9,13 @@ use Symfony\Component\Process\Process;
 
 class ImageService
 {
+    const NAME_DELIMITER = "-";
 
     public function save($imageFile): int
     {
         $image = new Image;
 
-        $imageName = Str::uuid().$imageFile->getClientOriginalName();
+        $imageName = Str::uuid() . self::NAME_DELIMITER . $imageFile->getClientOriginalName();
         $path = $imageFile->storeAs('uploads', $imageName, 'public');
 
         $image->name = $imageName;
@@ -23,11 +24,16 @@ class ImageService
         return $image->id;
     }
 
-    public function predict($imageFile):float
+    public function predict($imageFile): float
     {
         $id = $this->save($imageFile);
         $image = Image::where('id', $id)->firstOrFail();
-        $process = new Process(['rm', $image->path]);
+        $process = new Process(
+            [
+                '/home/ubuntu/predict_rest/image_quality_assessment/predict  --docker-image nima-cpu --base-model-nam>',
+                $image->path
+            ]
+        );
         $process->run();
         return 9.9;
     }
