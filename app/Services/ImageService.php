@@ -25,7 +25,7 @@ class ImageService
         return $image->id;
     }
 
-    public function predict($imageFile): float
+    public function predict($imageFile)
     {
         $id = $this->save($imageFile);
         $image = Image::where('id', $id)->firstOrFail();
@@ -37,14 +37,17 @@ class ImageService
                 '--base-model-name',
                 'MobileNet',
                 '--weights-file',
-                base_path() . $image->path
+                '/home/ubuntu/predict_rest/image_quality_assessment/models/MobileNet/weights_mobilenet_aesthetic_0.07.hdf5',
+                '--image-source',
+                "/home/ubuntu/predict_rest/image_quality_assessment/src" . str_replace("/storage", "", $image->path)
             ]
         );
         $process->run();
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }
 
-        return $process->getOutput();
+        while ($process->isRunning()) {
+            usleep(1000);
+        }
+        $jsonOutput = strstr(strstr($process->getOutput(), "{"), "}", true)."}";
+        return json_decode($jsonOutput, true)["mean_score_prediction"];
     }
 }
